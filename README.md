@@ -2,7 +2,7 @@ Quickstart
 ==========
 
 *gentile.py* is a quick hack that will convert a jpeg of a map into
-tiles that Garmin GPS unit can display instead of the regular
+tiles that Garmin GPS units can display instead of the regular
 basemap.  
 
 run it like this:
