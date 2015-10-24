@@ -1,4 +1,4 @@
-QUICKSTART
+Quickstart
 ==========
 
 *gentile.py* is a quick hack that will convert a jpeg of a map into
@@ -9,7 +9,7 @@ run it like this:
 
     gentile.py -t 30 -i North-Shore_49.470808_49.336874_-122.980824_-123.131780.jpg   
 
-and it will split it into 1024x1024x pixel tile jpegs, each wrapped in a kmz file:
+and it will split it into 1024x1024 pixel tile jpegs, each wrapped in a kmz file:
 
     North-Shore_000.kmz	North-Shore_007.kmz	North-Shore_014.kmz	North-Shore_021.kmz	North-Shore_028.kmz
     North-Shore_001.kmz	North-Shore_008.kmz	North-Shore_015.kmz	North-Shore_022.kmz	North-Shore_029.kmz
@@ -19,10 +19,10 @@ and it will split it into 1024x1024x pixel tile jpegs, each wrapped in a kmz fil
     North-Shore_005.kmz	North-Shore_012.kmz	North-Shore_019.kmz	North-Shore_026.kmz	North-Shore_033.kmz
     North-Shore_006.kmz	North-Shore_013.kmz	North-Shore_020.kmz	North-Shore_027.kmz	North-Shore_034.kmz
 
-Plug in your GPS via USB and copy the kmz files to its /Garmin/CustomMaps/ directory.  These maps tiles should now be 
-displayed on you GPS when you look at that area.
+Plug in your GPS via USB and copy the kmz files to its /Garmin/CustomMaps/ directory.  These map tiles should now be 
+displayed on your GPS when you look at that area.
 
-SYSTEM REQUIREMENTS
+System Requirements
 ===================
 
 * python 2.7
@@ -31,7 +31,7 @@ SYSTEM REQUIREMENTS
 
 Tested on OS X 10.10 using brew to install imagemagick.  
 
-MAP FILE NAMES
+Map File Names
 ==============
 
 Maps can be jpeg, tiff or other formats supported by ImageMagick. The
@@ -45,7 +45,7 @@ decimal degrees. The syntax is:
 Don't use underscore anywhere in the name except as one of the four separators above. 
 
 
-FIGURING OUT THE BOUNDING BOX
+Figuring Out The Bounding Box
 =============================
 
 Try using GoogleEarth (Add->Image Overlay) and fiddling with the
@@ -54,7 +54,7 @@ coordinates with gentile.py.  Tune it by using the GPS with the kmz
 files and observe if it's offset N-S and/or E-W.  Regenerate the tiles
 with adjusted coordinates.
 
-HOW MANY TILES
+How Many Tiles
 ==============
 
 The '-t' parameter suggests the maximum number of tiles to
