@@ -30,6 +30,12 @@ import os
 import tempfile
 from string import Template
 
+
+convertProg = 'convert'  # try 'gm convert' for GraphicsMagick equiv
+identifyProg = 'identify' # 'gm identify'
+zipProg = 'zip'
+
+
 kmlHeader = '''<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
 '''
@@ -54,7 +60,6 @@ kmlOverlayTemplate = '''<GroundOverlay>
 
 kmlFooter ='''</kml>
 '''
-
 
 def parseArgs():
     '''Returns (args,parser). parser in case you want to dump help'''
@@ -91,7 +96,7 @@ def getMapAttrsFromArgs(args, parser):
 
 def getImageWxH(imageFilename):
     '''Returns an int two-tuple (width,height) of the given image file in pixels'''
-    whList = subprocess.check_output(['identify', '-format', '%w %h', imageFilename]).decode('utf-8').split()
+    whList = subprocess.check_output([identifyProg, '-format', '%w %h', imageFilename]).decode('utf-8').split()
     return (int(whList[0]),int(whList[1]))
 
 
@@ -113,7 +118,6 @@ def main():
 
     # create temp dir and cd there. zip needs working dir so skip working with abs paths
     wdir = tempfile.mkdtemp(prefix='gentile-', dir='.')
-    #tilesdir = wdir + '/tiles'
     tilesdir = os.path.join(wdir,'tiles')
     os.makedirs(tilesdir)
     os.chdir(wdir)
@@ -122,15 +126,15 @@ def main():
     maxPixels = args.maxTiles * 1024 * 1024
     if (maxPixels < (height * width)):
         newImageFilename = 'tmp1.jpg'
-        subprocess.check_output(['convert', imageFilename, '-resize', '@'+str(maxPixels), newImageFilename])
+        subprocess.check_output([convertProg, imageFilename, '-resize', '@'+str(maxPixels), newImageFilename])
         imageFilename = newImageFilename
 
     newImageFilename = 'tmp2.jpg'
-    subprocess.check_output(['convert', imageFilename, '-strip', '-interlace', 'none', newImageFilename ])
+    subprocess.check_output([convertProg, imageFilename, '-strip', '-interlace', 'none', newImageFilename ])
     imageFileName = newImageFilename
 
     # create 1024x1024 tiles from the image in tiledir
-    subprocess.check_output(['convert', '-crop', '1024x1024', imageFilename, os.path.join(tilesdir, name + '_tile_%03d.jpg')])
+    subprocess.check_output([convertProg, '-crop', '1024x1024', imageFilename, '+adjoin', os.path.join(tilesdir, name + '_tile_%03d.jpg')])
 
     (fullWidth,fullHeight) = getImageWxH(imageFilename)
 
@@ -162,7 +166,7 @@ def main():
 
         os.rename(os.path.join(tilesdir, tileFile), os.path.join(kdir,tileFile))
         os.chdir(kdir)
-        subprocess.check_output(['zip', '-r', '../' + tileName + '.kmz', '.'])
+        subprocess.check_output([zipProg, '-r', '../' + tileName + '.kmz', '.'])
         os.chdir('..')
         if (tileWidthSum >= fullWidth):
             tileNorth = tileSouth
