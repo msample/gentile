@@ -63,7 +63,7 @@ gentile.py will reduce the resolution of (a copy of) the image until it
 can be cut it into ~maxtiles 1024x1024 pieces.
 
 Setting maxtiles too high may exceed the capacity of your GPS device.  A
-Garmin 62s can hold a maxiumum of 100 tiles while some other models support 500
+Garmin 62s can hold a maxiumum of 100 tiles while some other models support 500.
 
 Run the following for other options:
   

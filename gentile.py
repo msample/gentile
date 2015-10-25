@@ -81,18 +81,11 @@ def parseArgs():
 
 def getMapAttrsFromArgs(args, parser):
     '''Returns tuple (mapNameStr, northLatFloat, southLatFloat, eastLongFloat, westLongFloat)'''
-    m = re.search("([^/_]+)_([^_]+)_([^_]+)_([^_]+)_([^_]+)\..*",  args.image)
-    name = m.group(1)
-    north = m.group(2)
-    south = m.group(3)
-    east = m.group(4)
-    west = m.group(5)
-    decDegreesRe = '-?[0-9]+\.[0-9]+'
-    if  not (re.match(decDegreesRe, north) and re.match(decDegreesRe, south) and 
-             re.match(decDegreesRe, east) and re.match(decDegreesRe, west)):
-        parser.error(args.image + " - malformed image file name. Decimal degrees of bounding box required in file name")
+    m = re.search("([^/_]+)_(-?[0-9]+\.[0-9]+)_(-?[0-9]+\.[0-9]+)_(-?[0-9]+\.[0-9]+)_(-?[0-9]+\.[0-9]+).*", args.image)
+    if m is None:
+        parser.error(args.image + ' - malformed image file name. Decimal degrees of bounding box required in file name. Use "gentile.py -h" for more details.')
         sys.exit(-1)
-
+    (name,north,south,east,west) = m.groups()
     return (name,float(north),float(south),float(east),float(west))
 
 
