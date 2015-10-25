@@ -31,9 +31,11 @@ import tempfile
 from string import Template
 
 
-convertProg = 'convert'  # try 'gm convert' for GraphicsMagick equiv
-identifyProg = 'identify' # 'gm identify'
-zipProg = 'zip'
+convertProg = ['convert']   # ImageMagick progs
+identifyProg = ['identify']
+#convertProg = ['gm', 'convert']    # GraphicsMagick progs
+#identifyProg = ['gm', 'identify']
+zipProg = ['zip']
 
 
 kmlHeader = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -96,7 +98,7 @@ def getMapAttrsFromArgs(args, parser):
 
 def getImageWxH(imageFilename):
     '''Returns an int two-tuple (width,height) of the given image file in pixels'''
-    whList = subprocess.check_output([identifyProg, '-format', '%w %h', imageFilename]).decode('utf-8').split()
+    whList = subprocess.check_output(identifyProg + ['-format', '%w %h', imageFilename]).decode('utf-8').split()
     return (int(whList[0]),int(whList[1]))
 
 
@@ -126,15 +128,15 @@ def main():
     maxPixels = args.maxTiles * 1024 * 1024
     if (maxPixels < (height * width)):
         newImageFilename = 'tmp1.jpg'
-        subprocess.check_output([convertProg, imageFilename, '-resize', '@'+str(maxPixels), newImageFilename])
+        subprocess.check_output(convertProg + [imageFilename, '-resize', '@'+str(maxPixels), newImageFilename])
         imageFilename = newImageFilename
 
     newImageFilename = 'tmp2.jpg'
-    subprocess.check_output([convertProg, imageFilename, '-strip', '-interlace', 'none', newImageFilename ])
+    subprocess.check_output(convertProg + [imageFilename, '-strip', '-interlace', 'none', newImageFilename ])
     imageFileName = newImageFilename
 
     # create 1024x1024 tiles from the image in tiledir
-    subprocess.check_output([convertProg, '-crop', '1024x1024', imageFilename, '+adjoin', os.path.join(tilesdir, name + '_tile_%03d.jpg')])
+    subprocess.check_output(convertProg + ['-crop', '1024x1024', imageFilename, '+adjoin', os.path.join(tilesdir, name + '_tile_%03d.jpg')])
 
     (fullWidth,fullHeight) = getImageWxH(imageFilename)
 
@@ -166,7 +168,7 @@ def main():
 
         os.rename(os.path.join(tilesdir, tileFile), os.path.join(kdir,tileFile))
         os.chdir(kdir)
-        subprocess.check_output([zipProg, '-r', '../' + tileName + '.kmz', '.'])
+        subprocess.check_output(zipProg + ['-r', '../' + tileName + '.kmz', '.'])
         os.chdir('..')
         if (tileWidthSum >= fullWidth):
             tileNorth = tileSouth
