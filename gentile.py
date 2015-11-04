@@ -38,29 +38,32 @@ identifyProg = ['identify']
 zipProg = ['zip']
 
 
-kmlHeader = '''<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
-'''
-
-kmlOverlayTemplate = '''<GroundOverlay>
+kmlHeaderTemplate = '''<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
   <name>$name</name>
-  <color>bdffffff</color>
-  <drawOrder>$drawingOrder</drawOrder>
-  <Icon>
-    <href>$tileFileName</href>
-    <viewBoundScale>1.0</viewBoundScale>
-  </Icon>
-  <LatLonBox>
-    <north>$north</north>
-    <south>$south</south>
-    <east>$east</east>
-    <west>$west</west>
-    <rotation>0.0</rotation>
-  </LatLonBox>
-</GroundOverlay>
 '''
 
-kmlFooter ='''</kml>
+kmlOverlayTemplate = '''  <GroundOverlay>
+    <name>$tileName</name>
+    <color>bdffffff</color>
+    <drawOrder>$drawingOrder</drawOrder>
+    <Icon>
+      <href>$tileFileName</href>
+      <viewBoundScale>1.0</viewBoundScale>
+    </Icon>
+    <LatLonBox>
+      <north>$north</north>
+      <south>$south</south>
+      <east>$east</east>
+      <west>$west</west>
+      <rotation>0.0</rotation>
+    </LatLonBox>
+  </GroundOverlay>
+'''
+
+kmlFooter ='''</Document>
+</kml>
 '''
 
 def parseArgs():
@@ -140,15 +143,22 @@ def main():
 
     (fullWidth,fullHeight) = getImageWxH(imageFilename)
 
+    # create directory for kmz directory structure & start doc.kml file
     template = Template(kmlOverlayTemplate)
+    kdir = name
+    os.makedirs(kdir)
+    kmlFile = open(os.path.join(kdir,'doc.kml'), 'w+')
+    kmlFile.write(Template(kmlHeaderTemplate).substitute(name=name))
+
     tileNorth = north
     tileWest = west
     tileWidthSum = 0
     dirCount = 0
 
-    # stash each tile in its own kmz file
+    # add each tile to kmz directory and an entry for it in the doc.kml
+    # traverses tiles left to right starting at top left (tile 000)
     for tileFile in sorted(os.listdir('tiles')):
-        # right edge or bottom may not be 1024x1024
+        # Note: right edge and bottom tiles may not be 1024x1024
         (tileWidth,tileHeight) = getImageWxH(os.path.join(tilesdir,tileFile))
         nsDelta = (float(tileHeight)/fullHeight)*(north-south)
         ewDelta = (float(tileWidth)/fullWidth)*((east-west)%360)
@@ -157,19 +167,11 @@ def main():
         tileSouth = tileNorth - nsDelta
         tileName = name + ('_%03d' % dirCount)
         dirCount += 1
-        kdir = tileName
-        os.makedirs(kdir)
-        kmlFile = open(os.path.join(kdir,'doc.kml'), 'w+')
-        kmlFile.write(kmlHeader)
-        overlay = template.substitute(north=tileNorth, south=tileSouth, east=tileEast, west=tileWest, name=tileFile, drawingOrder=args.drawingOrder, tileFileName=tileFile)
+        # add entry to doc.kml for this tile
+        overlay = template.substitute(north=tileNorth, south=tileSouth, east=tileEast, west=tileWest, tileName=tileFile, drawingOrder=args.drawingOrder, tileFileName=tileFile)
         kmlFile.write(overlay)
-        kmlFile.write(kmlFooter)
-        kmlFile.close()
-
+        # move tile jpg from tiles dir to kmz dir
         os.rename(os.path.join(tilesdir, tileFile), os.path.join(kdir,tileFile))
-        os.chdir(kdir)
-        subprocess.check_output(zipProg + ['-r', '../' + tileName + '.kmz', '.'])
-        os.chdir('..')
         if (tileWidthSum >= fullWidth):
             tileNorth = tileSouth
             tileWest = west
@@ -177,7 +179,13 @@ def main():
         else:
             tileWest = tileEast
 
-    # move all the kmz files to original working dir and nuke this tmp-dir
+    kmlFile.write(kmlFooter)
+    kmlFile.close()
+    os.chdir(kdir)
+    subprocess.check_output(zipProg + ['-r', '../' + name + '.kmz', '.'])
+    os.chdir('..')
+
+    # move the kmz file(s) to original working dir and nuke this tmp-dir
     files = os.listdir('.')
     for f in files:
         if f.endswith('.kmz'):

@@ -9,15 +9,9 @@ run it like this:
 
     gentile.py -t 30 -i North-Shore_49.470808_49.336874_-122.980824_-123.131780.jpg   
 
-and it will split it into 1024x1024 pixel tile jpegs, each wrapped in a kmz file:
+and it will split it into 1024x1024 pixel geo-anchored jpegs, all wrapped in one kmz file:
 
-    North-Shore_000.kmz    North-Shore_007.kmz    North-Shore_014.kmz    North-Shore_021.kmz    North-Shore_028.kmz
-    North-Shore_001.kmz    North-Shore_008.kmz    North-Shore_015.kmz    North-Shore_022.kmz    North-Shore_029.kmz
-    North-Shore_002.kmz    North-Shore_009.kmz    North-Shore_016.kmz    North-Shore_023.kmz    North-Shore_030.kmz
-    North-Shore_003.kmz    North-Shore_010.kmz    North-Shore_017.kmz    North-Shore_024.kmz    North-Shore_031.kmz
-    North-Shore_004.kmz    North-Shore_011.kmz    North-Shore_018.kmz    North-Shore_025.kmz    North-Shore_032.kmz
-    North-Shore_005.kmz    North-Shore_012.kmz    North-Shore_019.kmz    North-Shore_026.kmz    North-Shore_033.kmz
-    North-Shore_006.kmz    North-Shore_013.kmz    North-Shore_020.kmz    North-Shore_027.kmz    North-Shore_034.kmz
+    North-Shore.kmz
 
 Plug in your GPS via USB and copy the kmz files to its /Garmin/CustomMaps/ directory.  These map tiles should now be 
 displayed on your GPS when you look at that area.
@@ -48,11 +42,11 @@ Don't use underscore anywhere in the name except as one of the four separators a
 Figuring Out The Bounding Box
 =============================
 
-Try using GoogleEarth (Add->Image Overlay) and fiddling with the
-coordinates in the Location tab to postion the map.  Then try those
-coordinates with gentile.py.  Tune it by using the GPS with the kmz
-files and observe if it's offset N-S and/or E-W.  Regenerate the tiles
-with adjusted coordinates.
+Try using GoogleEarth to load an image (Add->Image Overlay) and
+fiddling with the coordinates in the Location tab to postion the map.
+Then try those coordinates with gentile.py.  Tune it by using the GPS
+with the kmz files and observe if it is offset N-S and/or E-W.
+Regenerate the tiles with adjusted coordinates.
 
 How Many Tiles
 ==============
